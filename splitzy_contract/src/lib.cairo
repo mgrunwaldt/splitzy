@@ -1,6 +1,5 @@
 #[starknet::interface]
 pub trait IMinimalContract<TContractState> {
-    fn get_true(self: @TContractState) -> bool;
     fn get_balance(self: @TContractState, key: MinimalContract::BalanceKey) -> i128;
     fn set_balance(ref self: TContractState, key: MinimalContract::BalanceKey, value: i128);
 }
@@ -25,10 +24,6 @@ pub mod MinimalContract {
 
     #[abi(embed_v0)] 
     impl MinimalContractImpl of super::IMinimalContract<ContractState> {
-        fn get_true(self: @ContractState) -> bool {
-            true
-        }
-
         fn get_balance(self: @ContractState, key: BalanceKey) -> i128 {
             self.balances.read(key) 
         }
