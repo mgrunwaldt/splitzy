@@ -1,0 +1,22 @@
+[package]
+name = "splitzy_contract"
+version = "0.1.0"
+edition = "2023_11"
+
+# See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
+
+[dependencies]
+starknet = "2.9.2"
+
+[dev-dependencies]
+cairo_test = "2.9.2"
+snforge_std = "0.41.0" # Updated to match snforge version recommendation
+
+[[target.starknet-contract]]
+casm = true
+
+[scripts]
+test = "snforge test"
+
+[tool.scarb]
+allow-prebuilt-plugins = ["snforge_std"]
