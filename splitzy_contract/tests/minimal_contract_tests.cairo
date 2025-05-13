@@ -1,41 +1,36 @@
 #[cfg(test)]
 mod tests {
-    // Imports for dispatcher and trait, generated at crate level due to explicit interface
     use splitzy_contract::{
-        IMinimalContractDispatcher,      // The dispatcher struct
-        IMinimalContractDispatcherTrait  // The dispatcher trait (for method calls)
+        IMinimalContractDispatcher,      
+        IMinimalContractDispatcherTrait  
     };
 
-    // BalanceKey is defined within your MinimalContract module
     use splitzy_contract::MinimalContract::BalanceKey; 
 
-    use starknet::contract_address_const; // Will be needed for BalanceKey construction
+    use starknet::ContractAddress; 
+    use core::option::OptionTrait; 
     use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
 
-    fn deploy_minimal_contract() -> IMinimalContractDispatcher { // Return the dispatcher STRUCT
+    fn deploy_minimal_contract() -> IMinimalContractDispatcher { 
         let contract_class = declare("MinimalContract").unwrap().contract_class();
         let constructor_calldata = array![]; 
         let (_contract_address, _) = contract_class.deploy(@constructor_calldata).unwrap(); 
-        IMinimalContractDispatcher { contract_address: _contract_address } // Instantiate the dispatcher STRUCT
+        IMinimalContractDispatcher { contract_address: _contract_address } 
     }
 
     #[test]
     fn test_get_true_returns_true() {
         let dispatcher = deploy_minimal_contract();
-        // Call methods directly on the dispatcher instance.
-        // The IMinimalContractDispatcherTrait provides the methods.
         assert_eq!(dispatcher.get_true(), true, "get_true should return true");
     }
-
-    // TODO: Add tests for get_balance and set_balance
-    // Example for setting up a key (BalanceKey is now in scope via the use statement above):
-    // let test_key = BalanceKey { group_id: 1, user_address: contract_address_const::<'user1'>() };
 
     #[test]
     fn test_set_and_get_balance() {
         let dispatcher = deploy_minimal_contract();
 
-        let user1_address = contract_address_const::<'user1'>();
+        let user1_felt: felt252 = 1; 
+        let user1_address: ContractAddress = user1_felt.try_into().unwrap();
+        
         let test_key = BalanceKey { group_id: 1_felt252, user_address: user1_address };
         let test_value = 100_i128;
 
@@ -57,7 +52,8 @@ mod tests {
         assert_eq!(new_retrieved_balance, new_test_value, "New retrieved balance mismatch");
 
         // Test another key to ensure no interference
-        let user2_address = contract_address_const::<'user2'>();
+        let user2_felt: felt252 = 2; 
+        let user2_address: ContractAddress = user2_felt.try_into().unwrap();
         let another_key = BalanceKey { group_id: 1_felt252, user_address: user2_address };
         let balance_for_another_key = dispatcher.get_balance(another_key);
         assert_eq!(balance_for_another_key, 0_i128, "Balance for another key should be 0");
